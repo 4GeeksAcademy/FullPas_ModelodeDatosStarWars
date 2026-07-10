@@ -5,76 +5,181 @@ from typing import List
 
 db = SQLAlchemy()
 
+
+"""
+1. Declarar la tabla pivote. Relacionar dos tablas que seran muchos a muchos.
+2. Comunicarle a ambos modelos que estaran relacionados mediante la tabla pivote
+3. Indicarle a sqlalchemy que es la misma relacion, pero cada una cada cara de la misma moneda
+user.personajes_favoritos <--> personajes.favorited_by
+"""
+
+
+
+personajes_favoritos_tabla = db.Table(
+    "personajes_favoritos",
+    db.Column("user_id", ForeignKey("user.id"), primary_key=True),
+    db.Column("personaje_id", ForeignKey("personaje.id"), primary_key=True),
+)
+
+vehiculos_favoritos_tabla = db.Table(
+    "vehiculos_favoritos",
+    db.Column("user_id", ForeignKey("user.id"), primary_key=True),
+    db.Column("vehiculo_id", ForeignKey("vehiculo.id"), primary_key=True),
+)
+
+planetas_favoritos_tabla = db.Table(
+    "planetas_favoritos",
+    db.Column("user_id", ForeignKey("user.id"), primary_key=True),
+    db.Column("planeta_id", ForeignKey("planeta.id"), primary_key=True),
+)
+
+
 class User(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     email: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(nullable=False)
+    tipo: Mapped[str] = mapped_column(nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean(), nullable=False)
 
-    favoritos_personajes: Mapped[List["Fav_Personajes"]] = relationship(back_populates="user")
+    personajes_favoritos: Mapped[list["Personaje"]] = relationship(
+        secondary=personajes_favoritos_tabla,
+        back_populates="favorited_by"
+    )
+    vehiculos_favoritos: Mapped[list["Vehiculo"]] = relationship(
+        secondary=vehiculos_favoritos_tabla,
+        back_populates="favorited_by"
+    )
+
+    planetas_favoritos: Mapped[list["Planeta"]] = relationship(
+        secondary=planetas_favoritos_tabla,
+        back_populates="favorited_by"
+    )
 
     def serialize(self):
         return {
             "id": self.id,
             "email": self.email,
-            # do not serialize the password, its a security breach
+            "tipo": self.tipo
         }
     
-class Personajes(db.Model):
+    
+class Personaje(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     nombre: Mapped[str] = mapped_column(String(120), nullable=False)
     raza: Mapped[str] = mapped_column(nullable=False)
     nacimiento: Mapped[str] = mapped_column(nullable=False)
     color_ojos: Mapped[str] = mapped_column(nullable=False)
 
-    favoritos_personajes: Mapped[List["Fav_Personajes"]] = relationship(back_populates="personaje")
+    favorited_by: Mapped[list['User']] = relationship(
+        secondary=personajes_favoritos_tabla,
+        back_populates="personajes_favoritos"
+    )
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "nombre": self.nombre,
+            "raza": self.raza,
+            "nacimiento": self.nacimiento,
+            "color_ojos": self.color_ojos
+        }
 
 
-class Fav_Personajes(db.Model):
-    id: Mapped[int] = mapped_column(primary_key=True)
-
-    user: Mapped["User"] = relationship(back_populates="favoritos_personajes")
-    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
-
-    personaje: Mapped["Personajes"] = relationship(back_populates="favoritos_personajes")
-    personaje_id: Mapped[int] = mapped_column(ForeignKey("personajes.id"))
-                                        
-
-
-class Vehiculos(db.Model):
+class Vehiculo(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     nombre: Mapped[str] = mapped_column(String(120), nullable=False)
     tipo: Mapped[str] = mapped_column(nullable=False)
     tamaño: Mapped[str] = mapped_column(nullable=False)
 
-    favoritos_vehiculos: Mapped[List["Fav_Vehiculos"]] = relationship(back_populates="vehiculo")
+
+    favorited_by: Mapped[list['User']] = relationship(
+        secondary=vehiculos_favoritos_tabla,
+        back_populates="vehiculos_favoritos"
+    )
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "nombre": self.email,
+            "tipo": self.tipo,
+            "tamaño": self.tamaño
+        }
 
 
-class Fav_Vehiculos(db.Model):
-    id: Mapped[int] = mapped_column(primary_key=True)
-
-    user: Mapped["User"] = relationship(back_populates="favoritos_vehiculos")
-    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
-
-    vehiculo: Mapped["Personajes"] = relationship(back_populates="favoritos_personajes")
-    vehiculo_id: Mapped[int] = mapped_column(ForeignKey("vehiculos.id"))
-
-
-class Planetas(db.Model):
+class Planeta(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     nombre: Mapped[str] = mapped_column(String(120), nullable=False)
     tipo: Mapped[str] = mapped_column(nullable=False)
     tamaño: Mapped[str] = mapped_column(nullable=False)
     poblacion: Mapped[int] = mapped_column(nullable=False)
 
-    favoritos_planetas: Mapped[List["Fav_Planetas"]] = relationship(back_populates="planeta")
+    favorited_by: Mapped[list['User']] = relationship(
+        secondary=planetas_favoritos_tabla,
+        back_populates="planetas_favoritos"
+    )
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "nombre": self.email,
+            "tipo": self.tipo,
+            "tamaño": self.tamaño,
+            "poblacion": self.poblacion
+        }
 
 
-class Fav_Planetas(db.Model):
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    #favoritos_personajes: Mapped[List["Fav_Personajes"]] = relationship(back_populates="user")
+    #favoritos_personajes: Mapped[List["Fav_Personajes"]] = relationship(back_populates="personaje")
+""" class Fav_Personajes(db.Model):
+    id: Mapped[int] = mapped_column(primary_key=True)
+
+    user: Mapped["User"] = relationship(back_populates="favoritos_personajes")
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
+
+    personaje: Mapped["Personajes"] = relationship(back_populates="favoritos_personajes")
+    personaje_id: Mapped[int] = mapped_column(ForeignKey("personajes.id")) """
+                                        
+    
+    #favoritos_vehiculos: Mapped[List["Fav_Vehiculos"]] = relationship(back_populates="vehiculo")
+""" class Fav_Vehiculos(db.Model):
+    id: Mapped[int] = mapped_column(primary_key=True)
+
+    user: Mapped["User"] = relationship(back_populates="favoritos_vehiculos")
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
+
+    vehiculo: Mapped["Personajes"] = relationship(back_populates="favoritos_personajes")
+    vehiculo_id: Mapped[int] = mapped_column(ForeignKey("vehiculos.id")) """
+
+    #favoritos_planetas: Mapped[List["Fav_Planetas"]] = relationship(back_populates="planeta")
+""" class Fav_Planetas(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
 
     user: Mapped["User"] = relationship(back_populates="favoritos_planetas")
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
 
     planeta: Mapped["Planetas"] = relationship(back_populates="favoritos_planetas")
-    planeta_id: Mapped[int] = mapped_column(ForeignKey("planetas.id"))
+    planeta_id: Mapped[int] = mapped_column(ForeignKey("planetas.id")) """
+
