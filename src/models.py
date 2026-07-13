@@ -6,15 +6,6 @@ from typing import List
 db = SQLAlchemy()
 
 
-"""
-1. Declarar la tabla pivote. Relacionar dos tablas que seran muchos a muchos.
-2. Comunicarle a ambos modelos que estaran relacionados mediante la tabla pivote
-3. Indicarle a sqlalchemy que es la misma relacion, pero cada una cada cara de la misma moneda
-user.personajes_favoritos <--> personajes.favorited_by
-"""
-
-
-
 personajes_favoritos_tabla = db.Table(
     "personajes_favoritos",
     db.Column("user_id", ForeignKey("user.id"), primary_key=True),
