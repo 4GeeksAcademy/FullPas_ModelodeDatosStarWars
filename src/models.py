@@ -100,7 +100,7 @@ class Vehiculo(db.Model):
     def serialize(self):
         return {
             "id": self.id,
-            "nombre": self.email,
+            "nombre": self.nombre,
             "tipo": self.tipo,
             "tamaño": self.tamaño
         }
@@ -121,7 +121,7 @@ class Planeta(db.Model):
     def serialize(self):
         return {
             "id": self.id,
-            "nombre": self.email,
+            "nombre": self.nombre,
             "tipo": self.tipo,
             "tamaño": self.tamaño,
             "poblacion": self.poblacion
