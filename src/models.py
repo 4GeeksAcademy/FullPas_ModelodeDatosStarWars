@@ -6,15 +6,6 @@ from typing import List
 db = SQLAlchemy()
 
 
-"""
-1. Declarar la tabla pivote. Relacionar dos tablas que seran muchos a muchos.
-2. Comunicarle a ambos modelos que estaran relacionados mediante la tabla pivote
-3. Indicarle a sqlalchemy que es la misma relacion, pero cada una cada cara de la misma moneda
-user.personajes_favoritos <--> personajes.favorited_by
-"""
-
-
-
 personajes_favoritos_tabla = db.Table(
     "personajes_favoritos",
     db.Column("user_id", ForeignKey("user.id"), primary_key=True),
@@ -90,6 +81,7 @@ class Vehiculo(db.Model):
     nombre: Mapped[str] = mapped_column(String(120), nullable=False)
     tipo: Mapped[str] = mapped_column(nullable=False)
     tamaño: Mapped[str] = mapped_column(nullable=False)
+    peso: Mapped[str] = mapped_column(nullable=False)
 
 
     favorited_by: Mapped[list['User']] = relationship(
@@ -102,7 +94,8 @@ class Vehiculo(db.Model):
             "id": self.id,
             "nombre": self.nombre,
             "tipo": self.tipo,
-            "tamaño": self.tamaño
+            "tamaño": self.tamaño,
+            "peso": self.peso
         }
 
 
@@ -128,58 +121,9 @@ class Planeta(db.Model):
         }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    #favoritos_personajes: Mapped[List["Fav_Personajes"]] = relationship(back_populates="user")
-    #favoritos_personajes: Mapped[List["Fav_Personajes"]] = relationship(back_populates="personaje")
-""" class Fav_Personajes(db.Model):
-    id: Mapped[int] = mapped_column(primary_key=True)
-
-    user: Mapped["User"] = relationship(back_populates="favoritos_personajes")
-    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
-
-    personaje: Mapped["Personajes"] = relationship(back_populates="favoritos_personajes")
-    personaje_id: Mapped[int] = mapped_column(ForeignKey("personajes.id")) """
-                                        
-    
-    #favoritos_vehiculos: Mapped[List["Fav_Vehiculos"]] = relationship(back_populates="vehiculo")
-""" class Fav_Vehiculos(db.Model):
-    id: Mapped[int] = mapped_column(primary_key=True)
-
-    user: Mapped["User"] = relationship(back_populates="favoritos_vehiculos")
-    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
-
-    vehiculo: Mapped["Personajes"] = relationship(back_populates="favoritos_personajes")
-    vehiculo_id: Mapped[int] = mapped_column(ForeignKey("vehiculos.id")) """
-
-    #favoritos_planetas: Mapped[List["Fav_Planetas"]] = relationship(back_populates="planeta")
-""" class Fav_Planetas(db.Model):
-    id: Mapped[int] = mapped_column(primary_key=True)
-
-    user: Mapped["User"] = relationship(back_populates="favoritos_planetas")
-    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
-
-    planeta: Mapped["Planetas"] = relationship(back_populates="favoritos_planetas")
-    planeta_id: Mapped[int] = mapped_column(ForeignKey("planetas.id")) """
-
+"""
+1. Declarar la tabla pivote. Relacionar dos tablas que seran muchos a muchos.
+2. Comunicarle a ambos modelos que estaran relacionados mediante la tabla pivote
+3. Indicarle a sqlalchemy que es la misma relacion, pero cada una cada cara de la misma moneda
+user.personajes_favoritos <--> personajes.favorited_by
+"""
